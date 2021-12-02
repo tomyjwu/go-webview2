@@ -4,11 +4,12 @@
 package edge
 
 import (
-	"github.com/leaanthony/go-webview2/internal/w32"
 	"log"
 	"runtime"
 	"syscall"
 	"unsafe"
+
+	"github.com/leaanthony/go-webview2/internal/w32"
 
 	"github.com/leaanthony/go-webview2/webviewloader"
 	"golang.org/x/sys/windows"
@@ -110,6 +111,16 @@ type _IUnknownVtbl struct {
 	QueryInterface ComProc
 	AddRef         ComProc
 	Release        ComProc
+}
+
+func (i *_IUnknownVtbl) CallRelease(this unsafe.Pointer) error {
+	_, _, err := i.Release.Call(
+		uintptr(this),
+	)
+	if err != windows.ERROR_SUCCESS {
+		return err
+	}
+	return nil
 }
 
 type _IUnknownImpl interface {
