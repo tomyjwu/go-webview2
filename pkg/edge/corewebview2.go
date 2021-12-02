@@ -225,6 +225,7 @@ type ICoreWebView2Environment struct {
 	vtbl *iCoreWebView2EnvironmentVtbl
 }
 
+// CreateWebResourceResponse creates a new ICoreWebView2WebResourceResponse, it must be released after finishing using it.
 func (e *ICoreWebView2Environment) CreateWebResourceResponse(content []byte, statusCode int, reasonPhrase string, headers string) (*ICoreWebView2WebResourceResponse, error) {
 	var err error
 	var stream uintptr
@@ -235,6 +236,10 @@ func (e *ICoreWebView2Environment) CreateWebResourceResponse(content []byte, sta
 		if err != nil {
 			return nil, err
 		}
+
+		// Release the IStream after we are finished, CreateWebResourceResponse Call will increase the reference
+		// count on IStream and therefore it won't be freed until the reference count of the response is 0.
+		defer (*IStream)(unsafe.Pointer(stream)).Release()
 	}
 
 	// Convert string 'uri' to *uint16
