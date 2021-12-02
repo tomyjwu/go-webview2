@@ -4,13 +4,14 @@
 package edge
 
 import (
-	"github.com/leaanthony/go-webview2/internal/w32"
-	"golang.org/x/sys/windows"
 	"log"
 	"os"
 	"path/filepath"
 	"sync/atomic"
 	"unsafe"
+
+	"github.com/leaanthony/go-webview2/internal/w32"
+	"golang.org/x/sys/windows"
 )
 
 type Chromium struct {
@@ -253,6 +254,8 @@ func (e *Chromium) WebResourceRequested(sender *ICoreWebView2, args *ICoreWebVie
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer req.Release()
+
 	if e.WebResourceRequestedCallback != nil {
 		e.WebResourceRequestedCallback(req, args)
 	}
