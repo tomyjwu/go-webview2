@@ -6,14 +6,13 @@ package webview2
 import (
 	"encoding/json"
 	"errors"
+	"github.com/leaanthony/go-webview2/internal/w32"
+	"github.com/leaanthony/go-webview2/pkg/edge"
 	"log"
 	"reflect"
 	"strconv"
 	"sync"
 	"unsafe"
-
-	"github.com/leaanthony/go-webview2/internal/w32"
-	"github.com/leaanthony/go-webview2/pkg/edge"
 
 	"golang.org/x/sys/windows"
 )
