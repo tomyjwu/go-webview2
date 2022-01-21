@@ -30,7 +30,8 @@ type Chromium struct {
 	environment *ICoreWebView2Environment
 
 	// Settings
-	Debug bool
+	Debug    bool
+	DataPath string
 
 	// permissions
 	permissions      map[CoreWebView2PermissionKind]CoreWebView2PermissionState
@@ -59,14 +60,19 @@ func NewChromium() *Chromium {
 
 func (e *Chromium) Embed(hwnd uintptr) bool {
 	e.hwnd = hwnd
-	currentExePath := make([]uint16, windows.MAX_PATH)
-	_, err := windows.GetModuleFileName(windows.Handle(0), &currentExePath[0], windows.MAX_PATH)
-	if err != nil {
-		// What to do here?
-		return false
+
+	dataPath := e.DataPath
+	if dataPath == "" {
+		currentExePath := make([]uint16, windows.MAX_PATH)
+		_, err := windows.GetModuleFileName(windows.Handle(0), &currentExePath[0], windows.MAX_PATH)
+		if err != nil {
+			// What to do here?
+			return false
+		}
+		currentExeName := filepath.Base(windows.UTF16ToString(currentExePath))
+		dataPath = filepath.Join(os.Getenv("AppData"), currentExeName)
 	}
-	currentExeName := filepath.Base(windows.UTF16ToString(currentExePath))
-	dataPath := filepath.Join(os.Getenv("AppData"), currentExeName)
+
 	res, err := createCoreWebView2EnvironmentWithOptions(nil, windows.StringToUTF16Ptr(dataPath), 0, e.envCompleted)
 	if err != nil {
 		log.Printf("Error calling Webview2Loader: %v", err)
