@@ -68,6 +68,19 @@ func (i *ICoreWebView2Controller) PutBounds(bounds w32.Rect) error {
 	return nil
 }
 
+func (i *ICoreWebView2Controller) MoveFocus(reason COREWEBVIEW2_MOVE_FOCUS_REASON) error {
+	var err error
+
+	_, _, err = i.vtbl.MoveFocus.Call(
+		uintptr(unsafe.Pointer(i)),
+		uintptr(reason),
+	)
+	if err != windows.ERROR_SUCCESS {
+		return err
+	}
+	return nil
+}
+
 func (i *ICoreWebView2Controller) AddAcceleratorKeyPressed(eventHandler *ICoreWebView2AcceleratorKeyPressedEventHandler, token *_EventRegistrationToken) error {
 	var err error
 	_, _, err = i.vtbl.AddAcceleratorKeyPressed.Call(
