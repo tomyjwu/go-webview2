@@ -1,6 +1,7 @@
 package edge
 
 import (
+	"syscall"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
@@ -75,6 +76,23 @@ func (i *ICoreWebView2WebResourceRequest) GetContent() (*IStream, error) {
 		return nil, syscall.Errno(res)
 	}
 	return stream, nil
+}
+
+// GetHeaders returns the mutable HTTP request headers. Make sure to call
+// Release on the returned Object after finished using it.
+func (i *ICoreWebView2WebResourceRequest) GetHeaders() (*ICoreWebView2HttpRequestHeaders, error) {
+	var headers *ICoreWebView2HttpRequestHeaders
+	res, _, err := i.vtbl.GetHeaders.Call(
+		uintptr(unsafe.Pointer(i)),
+		uintptr(unsafe.Pointer(&headers)),
+	)
+	if err != windows.ERROR_SUCCESS {
+		return nil, err
+	}
+	if windows.Handle(res) != windows.S_OK {
+		return nil, syscall.Errno(res)
+	}
+	return headers, nil
 }
 
 func (i *ICoreWebView2WebResourceRequest) Release() error {
