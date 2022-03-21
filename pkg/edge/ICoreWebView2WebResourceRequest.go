@@ -60,6 +60,23 @@ func (i *ICoreWebView2WebResourceRequest) GetUri() (string, error) {
 	return uri, nil
 }
 
+// GetContent returns the body of the request. Returns nil if there's no body. Make sure to call
+// Release on the returned IStream after finished using it.
+func (i *ICoreWebView2WebResourceRequest) GetContent() (*IStream, error) {
+	var stream *IStream
+	res, _, err := i.vtbl.GetContent.Call(
+		uintptr(unsafe.Pointer(i)),
+		uintptr(unsafe.Pointer(&stream)),
+	)
+	if err != windows.ERROR_SUCCESS {
+		return nil, err
+	}
+	if windows.Handle(res) != windows.S_OK {
+		return nil, syscall.Errno(res)
+	}
+	return stream, nil
+}
+
 func (i *ICoreWebView2WebResourceRequest) Release() error {
 	return i.vtbl.CallRelease(unsafe.Pointer(i))
 }
