@@ -25,6 +25,25 @@ func (i *ICoreWebView2WebResourceRequest) AddRef() uintptr {
 	return i.AddRef()
 }
 
+func (i *ICoreWebView2WebResourceRequest) GetMethod() (string, error) {
+	// Create *uint16 to hold result
+	var _method *uint16
+	res, _, err := i.vtbl.GetMethod.Call(
+		uintptr(unsafe.Pointer(i)),
+		uintptr(unsafe.Pointer(&_method)),
+	)
+	if err != windows.ERROR_SUCCESS {
+		return "", err
+	}
+	if windows.Handle(res) != windows.S_OK {
+		return "", syscall.Errno(res)
+	}
+	// Get result and cleanup
+	uri := windows.UTF16PtrToString(_method)
+	windows.CoTaskMemFree(unsafe.Pointer(_method))
+	return uri, nil
+}
+
 func (i *ICoreWebView2WebResourceRequest) GetUri() (string, error) {
 	var err error
 	// Create *uint16 to hold result
